@@ -81,13 +81,13 @@ const Landing: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <button 
-              onClick={() => navigate('/', { state: { register: true } })}
+              onClick={() => navigate('/auth', { state: { register: true } })}
               className="btn-premium-primary text-lg px-10 py-4"
             >
               REGISTER AS CITIZEN
             </button>
             <button 
-              onClick={() => navigate('/', { state: { login: true } })}
+              onClick={() => navigate('/auth', { state: { login: true } })}
               className="btn-premium-outline text-lg px-10 py-4"
             >
               ADMIN LOGIN
