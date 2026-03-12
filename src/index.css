@@ -2,25 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Add smooth animations and professional design tweaks */
-body {
-  font-family: 'Arial', sans-serif;
-  transition: background-color 0.3s ease;
+@layer base {
+  body {
+    @apply bg-navy text-premium-white antialiased overflow-x-hidden;
+  }
 }
 
-button {
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
+@layer components {
+  .hero-gradient {
+    background: radial-gradient(circle at center, #0F2044 0%, #0A1628 100%);
+  }
+  
+  .glass-card {
+    @apply bg-navy-card/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl;
+  }
 
-button:hover {
-  transform: scale(1.05);
-}
+  .premium-input {
+    @apply bg-navy-deep border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-orange/50 focus:border-orange transition-all duration-300;
+  }
 
-input, textarea, select {
-  transition: border-color 0.3s ease;
-}
+  .btn-premium-primary {
+    @apply bg-gradient-to-r from-orange to-orange-saffron text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-orange/20 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300;
+  }
 
-input:focus, textarea:focus, select:focus {
-  border-color: #ff851b;
-  outline: none;
+  .btn-premium-outline {
+    @apply border-2 border-orange/50 text-orange font-bold py-3 px-8 rounded-xl hover:bg-orange/10 hover:border-orange transition-all duration-300;
+  }
+
+  .noise-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+  }
+
+  .grid-pattern {
+    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
 }
