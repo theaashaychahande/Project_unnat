@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,6 +11,7 @@
 }
 
 @layer components {
+  /* Government India Theme */
   .tricolor-strip {
     @apply h-[3px] flex;
   }
@@ -43,5 +46,33 @@
   .section-heading-gov::after {
     content: '';
     @apply absolute left-0 bottom-0 w-16 h-1 bg-gov-green-primary rounded-full;
+  }
+
+  /* Premium Dark Theme for Dashboards */
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+  }
+
+  .premium-input {
+    @apply bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-premium-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-orange/50 focus:border-orange/30 transition-all;
+  }
+
+  .btn-premium-primary {
+    @apply bg-orange hover:bg-orange-saffron text-navy font-black rounded-xl transition-all shadow-lg shadow-orange/20 hover:shadow-orange/40;
+  }
+
+  .hero-gradient {
+    @apply bg-gradient-to-br from-navy via-navy-deep to-navy-deep;
+  }
+
+  .grid-pattern {
+    background-image: 
+      linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent),
+      linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .05) 25%, rgba(255, 255, 255, .05) 26%, transparent 27%, transparent 74%, rgba(255, 255, 255, .05) 75%, rgba(255, 255, 255, .05) 76%, transparent 77%, transparent);
+    background-size: 50px 50px;
+  }
+
+  .noise-overlay {
+    background-image: url('data:image/svg+xml,<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise" /></filter><rect width="100%%" height="100%%" filter="url(%23noiseFilter)" opacity="0.1"/></svg>');
   }
 }

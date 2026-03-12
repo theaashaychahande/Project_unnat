@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Users, FileText, CheckCircle, Lightbulb, Droplet, Road, Trash2, Zap, TreePine, Building } from 'lucide-react';
+import { Users, FileText, CheckCircle, Lightbulb, Droplet, AlertTriangle, Trash2, Zap, TreePine, Building } from 'lucide-react';
 
 const StatItem = ({ value, label, icon: Icon }: { value: string; label: string; icon?: React.ElementType }) => (
   <div className="text-center p-4">
@@ -107,7 +107,7 @@ const Landing: React.FC = () => {
         <section className="container mx-auto px-6 py-16">
           <h3 className="section-heading-gov">Report Issues Across All Civic Departments</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-            <CategoryTile icon={Road} name="Roads" />
+            <CategoryTile icon={AlertTriangle} name="Roads" />
             <CategoryTile icon={Droplet} name="Water Supply" />
             <CategoryTile icon={Zap} name="Electricity" />
             <CategoryTile icon={Trash2} name="Garbage" />
