@@ -37,13 +37,17 @@ const Landing: React.FC = () => {
       {/* Navbar */}
       <nav className="bg-gov-white shadow-sm">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            <span className="text-3xl">🇮🇳</span>
-            <h1 className="font-baskerville text-2xl font-bold text-gov-green-dark">Project Unnat</h1>
+          <div>
+            <h1 className="font-baskerville text-3xl font-bold text-gov-green-dark">UNNAT</h1>
           </div>
           <div className="flex items-center space-x-4">
             <button onClick={handleLoginClick} className="btn-gov-outline">Login</button>
             <button onClick={handleRegisterClick} className="btn-gov-primary">Register</button>
+            <select className="border border-gov-green-primary bg-gov-white text-gov-green-primary font-bold py-2 px-3 rounded-md hover:bg-gov-green-primary hover:text-white transition-colors duration-200 cursor-pointer">
+              <option value="en">🌐 EN</option>
+              <option value="hi">हिंदी</option>
+              <option value="mr">मराठी</option>
+            </select>
           </div>
         </div>
         <div className="tricolor-strip">
