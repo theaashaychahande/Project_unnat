@@ -1,11 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth, db } from './firebase';
-import { 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
-  signOut, 
-  onAuthStateChanged
-} from 'firebase/auth';
+import { db } from './firebase';
 import { 
   collection, 
   doc, 
@@ -15,7 +9,9 @@ import {
   addDoc,
   updateDoc,
   query,
-  orderBy
+  orderBy,
+  where,
+  getDocs
 } from 'firebase/firestore';
 
 export type Role = 'Citizen' | 'Admin';
@@ -62,24 +58,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Listen to Auth State
+  // Listen to Auth State (Mocked with localStorage)
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        // Fetch user data from firestore
-        const docRef = doc(db, 'users', firebaseUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setCurrentUser({ id: firebaseUser.uid, ...docSnap.data() } as User);
-        } else {
+    const checkLocalAuth = () => {
+      const storedUser = localStorage.getItem('unnat_user');
+      if (storedUser) {
+        try {
+          setCurrentUser(JSON.parse(storedUser));
+        } catch (e) {
           setCurrentUser(null);
         }
       } else {
         setCurrentUser(null);
       }
       setLoading(false);
-    });
-    return () => unsub();
+    };
+    checkLocalAuth();
   }, []);
 
   // Listen to Complaints
@@ -95,7 +89,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => unsub();
   }, []);
 
-  // Listen to Users (for Admin) - Optional but existing logic had `users` list.
+  // Listen to Users (for Admin)
   useEffect(() => {
     if (currentUser?.role === 'Admin') {
       const unsub = onSnapshot(collection(db, 'users'), (snapshot) => {
@@ -111,7 +105,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      // Check if user exists in database
+      const q = query(collection(db, 'users'), where('email', '==', email));
+      const querySnapshot = await getDocs(q);
+      
+      let loggedInUser: User;
+
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        loggedInUser = { id: userDoc.id, ...userDoc.data() } as User;
+      } else {
+        // If no user found, mock one to keep auth open
+        const role: Role = email.toLowerCase().includes('admin') ? 'Admin' : 'Citizen';
+        loggedInUser = {
+          id: 'mock-' + Date.now().toString(),
+          name: email.split('@')[0],
+          email: email,
+          role: role
+        };
+      }
+      
+      setCurrentUser(loggedInUser);
+      localStorage.setItem('unnat_user', JSON.stringify(loggedInUser));
       return true;
     } catch (error) {
       console.error(error);
@@ -120,18 +135,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const register = async (name: string, email: string, role: Role, password: string): Promise<void> => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    // create user document
-    await setDoc(doc(db, 'users', user.uid), {
-      name,
-      email,
-      role
-    });
+    try {
+      const uid = 'user-' + Date.now().toString();
+      await setDoc(doc(db, 'users', uid), {
+        name,
+        email,
+        role
+      });
+      const newUser: User = { id: uid, name, email, role };
+      setCurrentUser(newUser);
+      localStorage.setItem('unnat_user', JSON.stringify(newUser));
+    } catch (error) {
+      console.error('Error during registration:', error);
+      throw error;
+    }
   };
 
   const logout = async (): Promise<void> => {
-    await signOut(auth);
+    setCurrentUser(null);
+    localStorage.removeItem('unnat_user');
   };
 
   const addComplaint = async (data: Omit<Complaint, 'id' | 'userId' | 'userName' | 'date' | 'status'>) => {
