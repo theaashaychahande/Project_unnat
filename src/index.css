@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add smooth animations and professional design tweaks */
+body {
+  font-family: 'Arial', sans-serif;
+  transition: background-color 0.3s ease;
+}
+
+button {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+input, textarea, select {
+  transition: border-color 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #ff851b;
+  outline: none;
+}
