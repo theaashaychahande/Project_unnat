@@ -6,6 +6,7 @@ module.exports = {
       colors: {
         gov: {
           background: '#F4F6F0',
+          light: '#F9FBF7',
           green: {
             primary: '#2D6A4F',
             secondary: '#40916C',
