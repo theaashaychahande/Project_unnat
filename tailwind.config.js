@@ -4,26 +4,28 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        navy: {
-          DEFAULT: '#0A1628',
-          deep: '#0F2044',
-          card: '#142035',
+        gov: {
+          background: '#F4F6F0',
+          green: {
+            primary: '#2D6A4F',
+            secondary: '#40916C',
+            light: '#D8F3DC',
+            dark: '#1B4332',
+          },
+          text: {
+            primary: '#1A1A1A',
+            secondary: '#4A5568',
+          },
+          border: '#B7D5C4',
+          white: '#FFFFFF',
         },
-        orange: {
-          DEFAULT: '#FF6B2B',
-          saffron: '#FF9933',
-        },
-        premium: {
-          white: '#F8F9FF',
-        }
       },
       fontFamily: {
-        syne: ['Syne', 'sans-serif'],
-        dm: ['"DM Sans"', 'sans-serif'],
+        tiro: ['"Tiro Devanagari Hindi"', 'serif'],
+        baskerville: ['"Libre Baskerville"', 'serif'],
+        noto: ['"Noto Sans"', 'sans-serif'],
+        mono: ['"DM Mono"', 'monospace'],
       },
-      animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      }
     },
   },
   plugins: [],

@@ -4,38 +4,44 @@
 
 @layer base {
   body {
-    @apply bg-navy text-premium-white antialiased overflow-x-hidden;
+    @apply bg-gov-background text-gov-text-primary antialiased;
   }
 }
 
 @layer components {
-  .hero-gradient {
-    background: radial-gradient(circle at center, #0F2044 0%, #0A1628 100%);
+  .tricolor-strip {
+    @apply h-[3px] flex;
   }
-  
-  .glass-card {
-    @apply bg-navy-card/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl;
+  .tricolor-strip > div {
+    @apply h-full w-1/3;
   }
-
-  .premium-input {
-    @apply bg-navy-deep border border-white/10 rounded-xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-orange/50 focus:border-orange transition-all duration-300;
+  .tricolor-strip > div:nth-child(1) {
+    background-color: #FF9933; /* Saffron */
   }
-
-  .btn-premium-primary {
-    @apply bg-gradient-to-r from-orange to-orange-saffron text-white font-bold py-3 px-8 rounded-xl shadow-lg hover:shadow-orange/20 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300;
+  .tricolor-strip > div:nth-child(2) {
+    background-color: #FFFFFF; /* White */
   }
-
-  .btn-premium-outline {
-    @apply border-2 border-orange/50 text-orange font-bold py-3 px-8 rounded-xl hover:bg-orange/10 hover:border-orange transition-all duration-300;
+  .tricolor-strip > div:nth-child(3) {
+    background-color: #2D6A4F; /* Green */
   }
 
-  .noise-overlay {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: 0.03;
+  .btn-gov-primary {
+    @apply bg-gov-green-primary text-white font-bold py-3 px-6 rounded-md hover:bg-gov-green-secondary transition-colors duration-200;
   }
 
-  .grid-pattern {
-    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
-    background-size: 24px 24px;
+  .btn-gov-outline {
+    @apply border border-gov-green-primary text-gov-green-primary font-bold py-3 px-6 rounded-md hover:bg-gov-green-primary hover:text-white transition-colors duration-200;
+  }
+
+  .card-gov {
+    @apply bg-gov-white border border-gov-border rounded-lg shadow-sm;
+  }
+
+  .section-heading-gov {
+    @apply text-3xl font-baskerville font-bold text-gov-green-dark mb-8 relative pb-2;
+  }
+  .section-heading-gov::after {
+    content: '';
+    @apply absolute left-0 bottom-0 w-16 h-1 bg-gov-green-primary rounded-full;
   }
 }

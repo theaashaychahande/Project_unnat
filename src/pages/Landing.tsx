@@ -1,114 +1,150 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Users, FileText, CheckCircle } from 'lucide-react';
+import { Users, FileText, CheckCircle, Lightbulb, Droplet, Road, Trash2, Zap, TreePine, Building } from 'lucide-react';
 
-const StatCounter = ({ label, count, suffix = "", icon: Icon }: any) => {
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      className="text-center p-6"
-    >
-      <div className="flex justify-center mb-4">
-        <div className="p-3 bg-orange/10 rounded-2xl text-orange">
-          <Icon size={32} />
-        </div>
-      </div>
-      <h3 className="text-4xl font-black font-syne text-white mb-2">
-        <motion.span
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 2 }}
-        >
-          {count}
-        </motion.span>
-        {suffix}
-      </h3>
-      <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">{label}</p>
-    </motion.div>
-  );
-};
+const StatItem = ({ value, label, icon: Icon }: { value: string; label: string; icon?: React.ElementType }) => (
+  <div className="text-center p-4">
+    {Icon && <Icon className="text-gov-green-primary mx-auto mb-2" size={32} />}
+    <p className="font-baskerville text-4xl font-bold text-gov-green-dark mb-1">{value}</p>
+    <p className="text-gov-text-secondary text-sm">{label}</p>
+  </div>
+);
+
+const CategoryTile = ({ icon: Icon, name }: { icon: React.ElementType; name: string }) => (
+  <motion.div
+    whileHover={{ y: -5, borderColor: '#2D6A4F' }}
+    className="card-gov p-6 flex flex-col items-center text-center cursor-pointer transition-all duration-200"
+  >
+    <Icon className="text-gov-green-primary mb-3" size={40} />
+    <p className="text-gov-text-primary font-bold">{name}</p>
+  </motion.div>
+);
 
 const Landing: React.FC = () => {
   const navigate = useNavigate();
 
+  const handleLoginClick = () => {
+    navigate('/auth', { state: { login: true } });
+  };
+
+  const handleRegisterClick = () => {
+    navigate('/auth', { state: { register: true } });
+  };
+
   return (
-    <div className="relative min-h-screen overflow-hidden font-dm selection:bg-orange selection:text-white">
-      {/* Background Layer */}
-      <div className="fixed inset-0 hero-gradient z-0"></div>
-      <div className="fixed inset-0 grid-pattern z-0 opacity-20"></div>
-      <div className="fixed inset-0 noise-overlay z-0 pointer-events-none"></div>
-
-      {/* Ashoka Chakra Watermark */}
-      <div className="fixed -bottom-32 -right-32 w-[600px] h-[600px] opacity-[0.03] z-0 pointer-events-none animate-spin-slow">
-        <svg viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14.5c-.28 0-.5.22-.5.5v2.22l-1.63-1.63a.495.495 0 00-.71 0 .495.495 0 000 .71l1.63 1.63h-2.22a.5.5 0 00-.5.5c0 .28.22.5.5.5h2.22l-1.63 1.63a.495.495 0 000 .71c.1.1.23.15.35.15s.26-.05.35-.15l1.63-1.63V15.5c0 .28.22.5.5.5s.5-.22.5-.5v-2.22l1.63 1.63c.1.1.23.15.35.15s.26-.05.35-.15a.495.495 0 000-.71L12.71 11h2.22c.28 0 .5-.22.5-.5s-.22-.5-.5-.5h-2.22l1.63-1.63a.495.495 0 000-.71.495.495 0 00-.71 0l-1.63 1.63V7.5c0-.28-.22-.5-.5-.5z"/>
-        </svg>
-      </div>
-
-      {/* Hero Section */}
-      <section className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 pt-20">
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1 }}
-          className="text-center max-w-5xl mx-auto"
-        >
-          <div className="mb-6">
-            <motion.span 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="px-4 py-2 bg-orange/10 border border-orange/20 rounded-full text-orange font-black text-xs uppercase tracking-[0.3em]"
-            >
-              Bharat Digital Governance
-            </motion.span>
+    <div className="min-h-screen bg-gov-background font-noto text-gov-text-primary">
+      {/* Navbar */}
+      <nav className="bg-gov-white shadow-sm">
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-3">
+            <span className="text-3xl">🇮🇳</span>
+            <h1 className="font-baskerville text-2xl font-bold text-gov-green-dark">Project Unnat</h1>
           </div>
-          
-          <h1 className="text-7xl md:text-9xl font-black font-syne leading-tight mb-4 tracking-tighter">
-            नागरिक <span className="text-orange drop-shadow-[0_0_30px_rgba(255,107,43,0.3)]">आवाज़</span>
-          </h1>
-          <h2 className="text-2xl md:text-4xl font-bold font-syne text-white/40 -mt-2 mb-10 tracking-widest uppercase">
-            Project <span className="text-orange">Unnat</span>
-          </h2>
-          
-          <p className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
-            Every complaint heard. Every issue resolved. <br />
-            <span className="text-white/60">Modernizing governance for the 21st century citizen.</span>
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <button 
-              onClick={() => navigate('/auth', { state: { register: true } })}
-              className="btn-premium-primary text-lg px-10 py-4"
-            >
-              REGISTER AS CITIZEN
-            </button>
-            <button 
-              onClick={() => navigate('/auth', { state: { login: true } })}
-              className="btn-premium-outline text-lg px-10 py-4"
-            >
-              ADMIN LOGIN
-            </button>
+          <div className="flex items-center space-x-4">
+            <button onClick={handleLoginClick} className="btn-gov-outline">Login</button>
+            <button onClick={handleRegisterClick} className="btn-gov-primary">Register</button>
           </div>
-        </motion.div>
-
-        {/* Stats Grid */}
-        <div className="container mx-auto mt-32 border-t border-white/5 pt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <StatCounter icon={CheckCircle} label="Complaints Resolved" count="12,400" suffix="+" />
-          <StatCounter icon={FileText} label="Wards Covered" count="48" />
-          <StatCounter icon={Users} label="Response Rate" count="98" suffix="%" />
         </div>
-      </section>
+        <div className="tricolor-strip">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </nav>
 
-      {/* Footer Details */}
-      <footer className="relative z-10 py-12 border-t border-white/5 text-center">
-        <div className="flex items-center justify-center space-x-2 text-white/20 font-black tracking-widest uppercase text-[10px]">
-          <span>Nagpur Municipal Corporation</span>
-          <span className="text-orange">•</span>
-          <span>Digital Transformation Cell</span>
+      <main>
+        {/* Hero Section */}
+        <section className="container mx-auto px-6 py-16 text-center">
+          <div className="card-gov p-8 md:p-16 max-w-4xl mx-auto">
+            <p className="text-gov-green-primary font-mono text-sm mb-4 tracking-wider">🇮🇳 Powered by Digital India</p>
+            <h2 className="font-tiro text-5xl md:text-6xl font-bold text-gov-green-dark leading-tight mb-4">नागरिक शिकायत प्रणाली</h2>
+            <p className="text-2xl text-gov-text-secondary mb-6">Citizen Complaint & Governance Platform</p>
+            <p className="text-gov-text-secondary max-w-2xl mx-auto mb-8">
+              A transparent platform for citizens of Nagpur to raise civic issues and track their resolution in real time.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
+              <button onClick={handleRegisterClick} className="btn-gov-primary">File a Complaint</button>
+              <button onClick={() => { /* Track complaint logic */ }} className="btn-gov-outline">Track Your Complaint</button>
+            </div>
+            <p className="text-gov-text-secondary text-sm font-mono">Available in Hindi · Marathi · English</p>
+          </div>
+        </section>
+
+        {/* Stats Bar */}
+        <section className="bg-gov-green-light py-8">
+          <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 divide-x divide-gov-border">
+            <StatItem value="48" label="Municipal Wards" icon={Building} />
+            <StatItem value="12,400+" label="Complaints Filed" icon={FileText} />
+            <StatItem value="98%" label="Resolution Rate" icon={CheckCircle} />
+            <StatItem value="32,000+" label="Citizens Registered" icon={Users} />
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section className="container mx-auto px-6 py-16">
+          <h3 className="section-heading-gov">How It Works</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="card-gov p-8 relative overflow-hidden">
+              <span className="absolute -top-4 -left-4 text-8xl font-bold text-gov-border opacity-50">01</span>
+              <h4 className="text-xl font-bold text-gov-green-dark mb-4">Register with Aadhaar verification</h4>
+              <p className="text-gov-text-secondary">Secure your identity and get started with a simple, verified registration process.</p>
+            </div>
+            <div className="card-gov p-8 relative overflow-hidden">
+              <span className="absolute -top-4 -left-4 text-8xl font-bold text-gov-border opacity-50">02</span>
+              <h4 className="text-xl font-bold text-gov-green-dark mb-4">Submit your complaint with photo and location</h4>
+              <p className="text-gov-text-secondary">Easily report issues by providing details, photos, and precise location data.</p>
+            </div>
+            <div className="card-gov p-8 relative overflow-hidden">
+              <span className="absolute -top-4 -left-4 text-8xl font-bold text-gov-border opacity-50">03</span>
+              <h4 className="text-xl font-bold text-gov-green-dark mb-4">Track resolution in real time</h4>
+              <p className="text-gov-text-secondary">Monitor the progress of your complaints and receive updates until resolution.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Complaint Categories Section */}
+        <section className="container mx-auto px-6 py-16">
+          <h3 className="section-heading-gov">Report Issues Across All Civic Departments</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            <CategoryTile icon={Road} name="Roads" />
+            <CategoryTile icon={Droplet} name="Water Supply" />
+            <CategoryTile icon={Zap} name="Electricity" />
+            <CategoryTile icon={Trash2} name="Garbage" />
+            <CategoryTile icon={Lightbulb} name="Street Lights" />
+            <CategoryTile icon={TreePine} name="Parks" />
+            <CategoryTile icon={Building} name="Public Property" />
+            <CategoryTile icon={FileText} name="Drainage" /> {/* Reusing FileText for Drainage for now */}
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gov-green-dark text-white py-12">
+        <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="flex items-center space-x-3">
+            <span className="text-3xl">🇮🇳</span>
+            <div>
+              <h4 className="font-baskerville text-xl font-bold">Project Unnat</h4>
+              <p className="text-sm text-white/70">Swachh Shasan. Swasth Nagrik.</p>
+            </div>
+          </div>
+          <div className="text-center">
+            <ul className="space-y-2">
+              <li><a href="#" className="hover:underline text-white/80">About Us</a></li>
+              <li><a href="#" className="hover:underline text-white/80">Help & Support</a></li>
+              <li><a href="#" className="hover:underline text-white/80">RTI</a></li>
+              <li><a href="#" className="hover:underline text-white/80">Privacy Policy</a></li>
+            </ul>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-white/70 mb-2">A Digital India Initiative</p>
+            {/* GOI Logo Placeholder */}
+            <div className="w-24 h-12 bg-white/10 ml-auto flex items-center justify-center text-white/50 text-xs rounded">GOI Logo</div>
+          </div>
+        </div>
+        <div className="border-t border-white/10 mt-8 pt-6 text-center text-white/50 text-xs">
+          © 2025 Nagpur Municipal Corporation. All rights reserved.
         </div>
       </footer>
     </div>
