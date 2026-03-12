@@ -57,8 +57,20 @@ const Landing: React.FC = () => {
         </div>
       </nav>
 
-      <main>
-        {/* Hero Section */}
+      <main className="relative overflow-hidden">
+        {/* India Map Background */}
+        <div className="absolute inset-0 opacity-5 blur-sm">
+          <svg viewBox="0 0 1000 1000" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <path d="M500 50 L600 100 L650 150 L700 200 L750 250 L800 300 L850 350 L900 400 L950 450 L980 500 L950 550 L900 600 L850 650 L800 700 L750 750 L700 800 L650 850 L600 900 L550 950 L500 980 L450 950 L400 900 L350 850 L300 800 L250 750 L200 700 L150 650 L100 600 L50 550 L20 500 L50 450 L100 400 L150 350 L200 300 L250 250 L300 200 L350 150 L400 100 L450 50 L500 50 Z" 
+                  fill="none" 
+                  stroke="#2D6A4F" 
+                  strokeWidth="2"/>
+            <path d="M500 100 L550 120 L600 140 L650 160 L700 180 L750 200 L800 220 L850 240 L900 260 L950 280 L980 300 L950 320 L900 340 L850 360 L800 380 L750 400 L700 420 L650 440 L600 460 L550 480 L500 500 L450 480 L400 460 L350 440 L300 420 L250 400 L200 380 L150 360 L100 340 L50 320 L20 300 L50 280 L100 260 L150 240 L200 220 L250 200 L300 180 L350 160 L400 140 L450 120 L500 100 Z" 
+                  fill="none" 
+                  stroke="#2D6A4F" 
+                  strokeWidth="1"/>
+          </svg>
+        </div>
         <section className="container mx-auto px-6 py-16 text-center">
           <div className="card-gov p-8 md:p-16 max-w-4xl mx-auto">
             <p className="text-gov-green-primary font-mono text-sm mb-4 tracking-wider">🇮🇳 Powered by Digital India</p>
