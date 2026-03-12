@@ -1,18 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { db } from './firebase';
-import { 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  onSnapshot, 
-  addDoc,
-  updateDoc,
-  query,
-  orderBy,
-  where,
-  getDocs
-} from 'firebase/firestore';
 
 export type Role = 'Citizen' | 'Admin';
 export type Urgency = 'Low' | 'Medium' | 'High' | 'Critical';
@@ -36,6 +22,8 @@ export interface Complaint {
   photoUrl?: string;
   date: string;
   status: Status;
+  latitude: number;
+  longitude: number;
 }
 
 interface AppContextType {
@@ -45,7 +33,7 @@ interface AppContextType {
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, role: Role, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  addComplaint: (complaint: Omit<Complaint, 'id' | 'userId' | 'userName' | 'date' | 'status'>) => Promise<void>;
+  addComplaint: (complaint: Omit<Complaint, 'id' | 'userId' | 'userName' | 'date' | 'status' | 'latitude' | 'longitude'>) => Promise<void>;
   updateComplaintStatus: (complaintId: string, status: Status) => Promise<void>;
   loading: boolean;
 }
@@ -58,120 +46,89 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Listen to Auth State (Mocked with localStorage)
+  // Load from LocalStorage
   useEffect(() => {
-    const checkLocalAuth = () => {
-      const storedUser = localStorage.getItem('unnat_user');
-      if (storedUser) {
-        try {
-          setCurrentUser(JSON.parse(storedUser));
-        } catch (e) {
-          setCurrentUser(null);
-        }
-      } else {
-        setCurrentUser(null);
-      }
-      setLoading(false);
-    };
-    checkLocalAuth();
-  }, []);
-
-  // Listen to Complaints
-  useEffect(() => {
-    const q = query(collection(db, 'complaints'), orderBy('date', 'desc'));
-    const unsub = onSnapshot(q, (snapshot) => {
-      const complaintsData: Complaint[] = [];
-      snapshot.forEach(doc => {
-        complaintsData.push({ id: doc.id, ...doc.data() } as Complaint);
-      });
-      setComplaints(complaintsData);
-    });
-    return () => unsub();
-  }, []);
-
-  // Listen to Users (for Admin)
-  useEffect(() => {
-    if (currentUser?.role === 'Admin') {
-      const unsub = onSnapshot(collection(db, 'users'), (snapshot) => {
-        const usersData: User[] = [];
-        snapshot.forEach(doc => {
-          usersData.push({ id: doc.id, ...doc.data() } as User);
-        });
-        setUsers(usersData);
-      });
-      return () => unsub();
-    }
-  }, [currentUser]);
-
-  const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // Check if user exists in database
-      const q = query(collection(db, 'users'), where('email', '==', email));
-      const querySnapshot = await getDocs(q);
-      
-      let loggedInUser: User;
+      const storedUser = localStorage.getItem('unnat_user');
+      const storedUsers = localStorage.getItem('unnat_users');
+      const storedComplaints = localStorage.getItem('unnat_complaints');
 
-      if (!querySnapshot.empty) {
-        const userDoc = querySnapshot.docs[0];
-        loggedInUser = { id: userDoc.id, ...userDoc.data() } as User;
-      } else {
-        // If no user found, mock one to keep auth open
-        const role: Role = email.toLowerCase().includes('admin') ? 'Admin' : 'Citizen';
-        loggedInUser = {
-          id: 'mock-' + Date.now().toString(),
-          name: email.split('@')[0],
-          email: email,
-          role: role
-        };
-      }
-      
-      setCurrentUser(loggedInUser);
-      localStorage.setItem('unnat_user', JSON.stringify(loggedInUser));
-      return true;
-    } catch (error) {
-      console.error(error);
-      return false;
+      if (storedUser && storedUser !== 'undefined') setCurrentUser(JSON.parse(storedUser));
+      if (storedUsers && storedUsers !== 'undefined') setUsers(JSON.parse(storedUsers));
+      if (storedComplaints && storedComplaints !== 'undefined') setComplaints(JSON.parse(storedComplaints));
+    } catch (e) {
+      console.error('Failed to parse storage:', e);
+      localStorage.clear(); // Clear potentially corrupted data
+    } finally {
+      setLoading(false);
     }
+  }, []);
+
+  // Sync to LocalStorage
+  useEffect(() => {
+    if (!loading) {
+      localStorage.setItem('unnat_users', JSON.stringify(users));
+      localStorage.setItem('unnat_complaints', JSON.stringify(complaints));
+      if (currentUser) {
+        localStorage.setItem('unnat_user', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('unnat_user');
+      }
+    }
+  }, [users, complaints, currentUser, loading]);
+
+  const login = async (email: string, _password: string): Promise<boolean> => {
+    const role: Role = email.toLowerCase().includes('admin') ? 'Admin' : 'Citizen';
+    const loggedInUser: User = {
+      id: 'user-' + Math.random().toString(36).substr(2, 9),
+      name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
+      email: email,
+      role: role
+    };
+    
+    setCurrentUser(loggedInUser);
+    if (!users.find(u => u.email === email)) {
+      setUsers(prev => [...prev, loggedInUser]);
+    }
+    return true;
   };
 
-  const register = async (name: string, email: string, role: Role, password: string): Promise<void> => {
-    try {
-      const uid = 'user-' + Date.now().toString();
-      await setDoc(doc(db, 'users', uid), {
-        name,
-        email,
-        role
-      });
-      const newUser: User = { id: uid, name, email, role };
-      setCurrentUser(newUser);
-      localStorage.setItem('unnat_user', JSON.stringify(newUser));
-    } catch (error) {
-      console.error('Error during registration:', error);
-      throw error;
-    }
+  const register = async (name: string, email: string, role: Role, _password: string): Promise<void> => {
+    const newUser: User = { 
+      id: 'user-' + Math.random().toString(36).substr(2, 9), 
+      name, 
+      email, 
+      role 
+    };
+    setCurrentUser(newUser);
+    setUsers(prev => [...prev, newUser]);
   };
 
   const logout = async (): Promise<void> => {
     setCurrentUser(null);
-    localStorage.removeItem('unnat_user');
   };
 
-  const addComplaint = async (data: Omit<Complaint, 'id' | 'userId' | 'userName' | 'date' | 'status'>) => {
+  const addComplaint = async (data: Omit<Complaint, 'id' | 'userId' | 'userName' | 'date' | 'status' | 'latitude' | 'longitude'>) => {
     if (!currentUser) return;
-    const newComplaint = {
+    
+    const latitude = 21.1458 + (Math.random() - 0.5) * 0.1;
+    const longitude = 79.0882 + (Math.random() - 0.5) * 0.1;
+
+    const newComplaint: Complaint = {
       ...data,
+      id: 'comp-' + Math.random().toString(36).substr(2, 9),
       userId: currentUser.id,
       userName: currentUser.name,
       date: new Date().toISOString(),
-      status: 'Pending'
+      status: 'Pending' as Status,
+      latitude,
+      longitude
     };
-    await addDoc(collection(db, 'complaints'), newComplaint);
+    setComplaints(prev => [newComplaint, ...prev]);
   };
 
   const updateComplaintStatus = async (complaintId: string, status: Status) => {
-    await updateDoc(doc(db, 'complaints', complaintId), {
-      status
-    });
+    setComplaints(prev => prev.map(c => c.id === complaintId ? { ...c, status } : c));
   };
 
   return (
@@ -186,7 +143,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       updateComplaintStatus,
       loading
     }}>
-      {!loading && children}
+      {children}
     </AppContext.Provider>
   );
 };

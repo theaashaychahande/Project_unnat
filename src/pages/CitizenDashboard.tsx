@@ -17,7 +17,7 @@ import {
 import { useAppContext, Urgency } from '../AppContext';
 
 const CitizenDashboard: React.FC = () => {
-  const { currentUser, logout, complaints, addComplaint } = useAppContext();
+  const { currentUser, logout, complaints, addComplaint, loading } = useAppContext();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -27,7 +27,16 @@ const CitizenDashboard: React.FC = () => {
     urgency: 'Medium' as Urgency,
   });
 
-  if (!currentUser) return null;
+  if (loading) return null;
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gov-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-red-500 font-bold">Please login to access dashboard.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
