@@ -114,7 +114,7 @@ const CitizenDashboard: React.FC = () => {
           >
             <div>
               <h2 className="text-4xl font-baskerville font-bold text-gov-green-dark mb-2">
-                Welcome, <span className="text-gov-green-primary">{currentUser.name.split(' ')[0]} 👋</span>
+                Welcome, <span className="text-gov-green-primary">{currentUser.name.split(' ')[0]}</span>
               </h2>
               <p className="text-gov-text-secondary font-bold uppercase tracking-widest text-xs">
                 {new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
@@ -238,7 +238,7 @@ const CitizenDashboard: React.FC = () => {
           <div className="relative space-y-6 before:absolute before:left-[19px] before:top-4 before:bottom-4 before:w-px before:bg-gov-border">
             {userComplaints.length === 0 ? (
               <div className="card-gov p-12 text-center">
-                <p className="text-gov-text-secondary italic font-medium">No complaints filed yet.</p>
+                <p className="text-gov-text-secondary font-medium">No complaints filed yet.</p>
               </div>
             ) : (
               <AnimatePresence mode='popLayout'>
