@@ -30,13 +30,17 @@ const Auth: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLogin) {
-      const success = login(formData.email, formData.password);
-      if (!success) alert('Invalid credentials');
-    } else {
-      register(formData.name, formData.email, formData.role);
+    try {
+      if (isLogin) {
+        const success = await login(formData.email, formData.password);
+        if (!success) alert('Invalid credentials');
+      } else {
+        await register(formData.name, formData.email, formData.role, formData.password);
+      }
+    } catch (error: any) {
+      alert(error.message);
     }
   };
 

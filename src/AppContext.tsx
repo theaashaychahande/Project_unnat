@@ -1,4 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { db } from './firebase';
+import { 
+  collection, 
+  doc, 
+  setDoc, 
+  getDoc, 
+  onSnapshot, 
+  addDoc,
+  updateDoc,
+  query,
+  orderBy,
+  where,
+  getDocs
+} from 'firebase/firestore';
 
 export type Role = 'Citizen' | 'Admin';
 export type Urgency = 'Low' | 'Medium' | 'High' | 'Critical';
@@ -28,97 +42,136 @@ interface AppContextType {
   currentUser: User | null;
   users: User[];
   complaints: Complaint[];
-  login: (email: string, password: string) => boolean;
-  register: (name: string, email: string, role: Role) => void;
-  logout: () => void;
-  addComplaint: (complaint: Omit<Complaint, 'id' | 'userId' | 'userName' | 'date' | 'status'>) => void;
-  updateComplaintStatus: (complaintId: string, status: Status) => void;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, role: Role, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  addComplaint: (complaint: Omit<Complaint, 'id' | 'userId' | 'userName' | 'date' | 'status'>) => Promise<void>;
+  updateComplaintStatus: (complaintId: string, status: Status) => Promise<void>;
+  loading: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('unnat_user');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [users, setUsers] = useState<User[]>(() => {
-    const saved = localStorage.getItem('unnat_users');
-    return saved ? JSON.parse(saved) : [
-      { id: '1', name: 'Admin User', email: 'admin@unnat.gov', role: 'Admin' },
-      { id: '2', name: 'John Doe', email: 'john@example.com', role: 'Citizen' }
-    ];
-  });
-
-  const [complaints, setComplaints] = useState<Complaint[]>(() => {
-    const saved = localStorage.getItem('unnat_complaints');
-    return saved ? JSON.parse(saved) : [
-      {
-        id: 'c1',
-        userId: '2',
-        userName: 'John Doe',
-        title: 'Broken Street Light',
-        description: 'The street light near the park is not working.',
-        location: 'Park Avenue',
-        urgency: 'Medium',
-        date: '2026-03-10',
-        status: 'Pending'
-      }
-    ];
-  });
-
+  // Listen to Auth State (Mocked with localStorage)
   useEffect(() => {
-    localStorage.setItem('unnat_user', JSON.stringify(currentUser));
+    const checkLocalAuth = () => {
+      const storedUser = localStorage.getItem('unnat_user');
+      if (storedUser) {
+        try {
+          setCurrentUser(JSON.parse(storedUser));
+        } catch (e) {
+          setCurrentUser(null);
+        }
+      } else {
+        setCurrentUser(null);
+      }
+      setLoading(false);
+    };
+    checkLocalAuth();
+  }, []);
+
+  // Listen to Complaints
+  useEffect(() => {
+    const q = query(collection(db, 'complaints'), orderBy('date', 'desc'));
+    const unsub = onSnapshot(q, (snapshot) => {
+      const complaintsData: Complaint[] = [];
+      snapshot.forEach(doc => {
+        complaintsData.push({ id: doc.id, ...doc.data() } as Complaint);
+      });
+      setComplaints(complaintsData);
+    });
+    return () => unsub();
+  }, []);
+
+  // Listen to Users (for Admin)
+  useEffect(() => {
+    if (currentUser?.role === 'Admin') {
+      const unsub = onSnapshot(collection(db, 'users'), (snapshot) => {
+        const usersData: User[] = [];
+        snapshot.forEach(doc => {
+          usersData.push({ id: doc.id, ...doc.data() } as User);
+        });
+        setUsers(usersData);
+      });
+      return () => unsub();
+    }
   }, [currentUser]);
 
-  useEffect(() => {
-    localStorage.setItem('unnat_users', JSON.stringify(users));
-  }, [users]);
+  const login = async (email: string, password: string): Promise<boolean> => {
+    try {
+      // Check if user exists in database
+      const q = query(collection(db, 'users'), where('email', '==', email));
+      const querySnapshot = await getDocs(q);
+      
+      let loggedInUser: User;
 
-  useEffect(() => {
-    localStorage.setItem('unnat_complaints', JSON.stringify(complaints));
-  }, [complaints]);
-
-  const login = (email: string, _password: string) => {
-    const user = users.find(u => u.email === email);
-    if (user) {
-      setCurrentUser(user);
+      if (!querySnapshot.empty) {
+        const userDoc = querySnapshot.docs[0];
+        loggedInUser = { id: userDoc.id, ...userDoc.data() } as User;
+      } else {
+        // If no user found, mock one to keep auth open
+        const role: Role = email.toLowerCase().includes('admin') ? 'Admin' : 'Citizen';
+        loggedInUser = {
+          id: 'mock-' + Date.now().toString(),
+          name: email.split('@')[0],
+          email: email,
+          role: role
+        };
+      }
+      
+      setCurrentUser(loggedInUser);
+      localStorage.setItem('unnat_user', JSON.stringify(loggedInUser));
       return true;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
-    return false;
   };
 
-  const register = (name: string, email: string, role: Role) => {
-    const newUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      name,
-      email,
-      role
-    };
-    setUsers(prev => [...prev, newUser]);
-    setCurrentUser(newUser);
+  const register = async (name: string, email: string, role: Role, password: string): Promise<void> => {
+    try {
+      const uid = 'user-' + Date.now().toString();
+      await setDoc(doc(db, 'users', uid), {
+        name,
+        email,
+        role
+      });
+      const newUser: User = { id: uid, name, email, role };
+      setCurrentUser(newUser);
+      localStorage.setItem('unnat_user', JSON.stringify(newUser));
+    } catch (error) {
+      console.error('Error during registration:', error);
+      throw error;
+    }
   };
 
-  const logout = () => {
+  const logout = async (): Promise<void> => {
     setCurrentUser(null);
+    localStorage.removeItem('unnat_user');
   };
 
-  const addComplaint = (data: Omit<Complaint, 'id' | 'userId' | 'userName' | 'date' | 'status'>) => {
+  const addComplaint = async (data: Omit<Complaint, 'id' | 'userId' | 'userName' | 'date' | 'status'>) => {
     if (!currentUser) return;
-    const newComplaint: Complaint = {
+    const newComplaint = {
       ...data,
-      id: Math.random().toString(36).substr(2, 9),
       userId: currentUser.id,
       userName: currentUser.name,
-      date: new Date().toISOString().split('T')[0],
+      date: new Date().toISOString(),
       status: 'Pending'
     };
-    setComplaints(prev => [newComplaint, ...prev]);
+    await addDoc(collection(db, 'complaints'), newComplaint);
   };
 
-  const updateComplaintStatus = (complaintId: string, status: Status) => {
-    setComplaints(prev => prev.map(c => c.id === complaintId ? { ...c, status } : c));
+  const updateComplaintStatus = async (complaintId: string, status: Status) => {
+    await updateDoc(doc(db, 'complaints', complaintId), {
+      status
+    });
   };
 
   return (
@@ -130,9 +183,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       register,
       logout,
       addComplaint,
-      updateComplaintStatus
+      updateComplaintStatus,
+      loading
     }}>
-      {children}
+      {!loading && children}
     </AppContext.Provider>
   );
 };
