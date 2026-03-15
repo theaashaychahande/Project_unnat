@@ -1,14 +1,17 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBeHnDN52YGFf3vpO7T80nnJY7gLBGNuGM",
-  authDomain: "project-unnat-web-2026.firebaseapp.com",
-  projectId: "project-unnat-web-2026",
-  storageBucket: "project-unnat-web-2026.firebasestorage.app",
-  messagingSenderId: "901529621779",
-  appId: "1:901529621779:web:85aa396daf50eb657db6e6"
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);
@@ -36,10 +39,10 @@ async function registerUser(email, password, role, name) {
 
 async function run() {
   console.log("Creating admin...");
-  await registerUser("admin@gmail.com", "17121712", "Admin", "Unnat Admin");
+  await registerUser(process.env.ADMIN_EMAIL || "admin@example.com", process.env.ADMIN_PASSWORD || "admin123", "Admin", "Unnat Admin");
   
   console.log("Creating user...");
-  await registerUser("user@gmail.com", "17121712", "Citizen", "Unnat Citizen");
+  await registerUser(process.env.USER_EMAIL || "user@example.com", process.env.USER_PASSWORD || "user123", "Citizen", "Unnat Citizen");
   
   process.exit(0);
 }
