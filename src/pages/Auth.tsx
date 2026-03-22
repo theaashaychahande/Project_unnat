@@ -1,7 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { User, Shield, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { useAppContext, Role } from '../AppContext';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  User,
+  Shield,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+} from "lucide-react";
+import { useAppContext } from "../contexts/AppContext";
+import { Role } from "../types";
 
 const Auth: React.FC = () => {
   const { login, register, currentUser } = useAppContext();
@@ -10,15 +19,19 @@ const Auth: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'Citizen' as Role,
+    name: "",
+    email: "",
+    password: "",
+    role: "Citizen" as Role,
   });
 
   useEffect(() => {
     if (currentUser) {
-      navigate(currentUser.role === 'Admin' ? '/admin-dashboard' : '/citizen-dashboard');
+      navigate(
+        currentUser.role === "Admin"
+          ? "/admin-dashboard"
+          : "/citizen-dashboard",
+      );
     }
     if (location.state?.register) setIsLogin(false);
     if (location.state?.login) setIsLogin(true);
@@ -35,7 +48,12 @@ const Auth: React.FC = () => {
       if (isLogin) {
         await login(formData.email, formData.password);
       } else {
-        await register(formData.name, formData.email, formData.role, formData.password);
+        await register(
+          formData.name,
+          formData.email,
+          formData.role,
+          formData.password,
+        );
       }
     } catch (error: any) {
       alert(error.message);
@@ -50,26 +68,35 @@ const Auth: React.FC = () => {
           <h1 className="text-4xl font-black font-baskerville text-gov-green-dark mb-2">
             UNNAT
           </h1>
-          <p className="text-gov-text-secondary font-bold uppercase tracking-widest text-xs">नागरिक शिकायत प्रणाली</p>
+          <p className="text-gov-text-secondary font-bold uppercase tracking-widest text-xs">
+            नागरिक शिकायत प्रणाली
+          </p>
         </div>
 
         {/* Main Card */}
         <div className="card-gov p-8 md:p-10 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gov-green-primary to-transparent"></div>
-          
+
           <h2 className="text-3xl font-baskerville font-bold text-gov-green-dark mb-2 border-b border-gov-border pb-4">
-            {isLogin ? 'Welcome Back' : 'Create Account'}
+            {isLogin ? "Welcome Back" : "Create Account"}
           </h2>
-          <p className="text-[10px] text-gov-green-primary font-bold mb-6 italic">* Any email/password will work for testing.</p>
+          <p className="text-[10px] text-gov-green-primary font-bold mb-6 italic">
+            * Any email/password will work for testing.
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-6">
               {/* Name Field (Register Only) */}
               {!isLogin && (
                 <div className="relative group/field">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-gov-green-primary mb-2 block ml-2">Full Legal Name</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gov-green-primary mb-2 block ml-2">
+                    Full Legal Name
+                  </label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gov-green-primary group-focus-within/field:text-gov-green-dark transition-colors" size={18} />
+                    <User
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gov-green-primary group-focus-within/field:text-gov-green-dark transition-colors"
+                      size={18}
+                    />
                     <input
                       type="text"
                       name="name"
@@ -85,9 +112,14 @@ const Auth: React.FC = () => {
 
               {/* Email Field */}
               <div className="relative group/field">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-gov-green-primary mb-2 block ml-2">Email Address</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gov-green-primary mb-2 block ml-2">
+                  Email Address
+                </label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gov-green-primary group-focus-within/field:text-gov-green-dark transition-colors" size={18} />
+                  <Mail
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gov-green-primary group-focus-within/field:text-gov-green-dark transition-colors"
+                    size={18}
+                  />
                   <input
                     type="email"
                     name="email"
@@ -102,9 +134,14 @@ const Auth: React.FC = () => {
 
               {/* Password Field */}
               <div className="relative group/field">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-gov-green-primary mb-2 block ml-2">Password</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gov-green-primary mb-2 block ml-2">
+                  Password
+                </label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gov-green-primary group-focus-within/field:text-gov-green-dark transition-colors" size={18} />
+                  <Lock
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-gov-green-primary group-focus-within/field:text-gov-green-dark transition-colors"
+                    size={18}
+                  />
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
@@ -114,7 +151,7 @@ const Auth: React.FC = () => {
                     placeholder="••••••••"
                     required
                   />
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-gov-green-primary hover:text-gov-green-dark transition-colors"
@@ -127,23 +164,33 @@ const Auth: React.FC = () => {
               {/* Role Selection (Register Only) */}
               {!isLogin && (
                 <div className="space-y-3">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-gov-green-primary mb-2 block ml-2">Select Role</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-gov-green-primary mb-2 block ml-2">
+                    Select Role
+                  </label>
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       type="button"
-                      onClick={() => setFormData({...formData, role: 'Citizen'})}
-                      className={`flex flex-col items-center justify-center p-4 rounded-lg border-2 transition-all font-bold ${formData.role === 'Citizen' ? 'border-gov-green-primary bg-gov-green-light text-gov-green-dark' : 'border-gov-border bg-gov-light text-gov-text-secondary hover:border-gov-green-primary'}`}
+                      onClick={() =>
+                        setFormData({ ...formData, role: "Citizen" })
+                      }
+                      className={`flex flex-col items-center justify-center p-4 rounded-lg border-2 transition-all font-bold ${formData.role === "Citizen" ? "border-gov-green-primary bg-gov-green-light text-gov-green-dark" : "border-gov-border bg-gov-light text-gov-text-secondary hover:border-gov-green-primary"}`}
                     >
                       <User size={24} className="mb-2" />
-                      <span className="text-xs uppercase tracking-widest">Citizen</span>
+                      <span className="text-xs uppercase tracking-widest">
+                        Citizen
+                      </span>
                     </button>
                     <button
                       type="button"
-                      onClick={() => setFormData({...formData, role: 'Admin'})}
-                      className={`flex flex-col items-center justify-center p-4 rounded-lg border-2 transition-all font-bold ${formData.role === 'Admin' ? 'border-gov-green-primary bg-gov-green-light text-gov-green-dark' : 'border-gov-border bg-gov-light text-gov-text-secondary hover:border-gov-green-primary'}`}
+                      onClick={() =>
+                        setFormData({ ...formData, role: "Admin" })
+                      }
+                      className={`flex flex-col items-center justify-center p-4 rounded-lg border-2 transition-all font-bold ${formData.role === "Admin" ? "border-gov-green-primary bg-gov-green-light text-gov-green-dark" : "border-gov-border bg-gov-light text-gov-text-secondary hover:border-gov-green-primary"}`}
                     >
                       <Shield size={24} className="mb-2" />
-                      <span className="text-xs uppercase tracking-widest">Admin</span>
+                      <span className="text-xs uppercase tracking-widest">
+                        Admin
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -155,7 +202,7 @@ const Auth: React.FC = () => {
               type="submit"
               className="btn-gov-primary w-full py-4 text-sm tracking-widest uppercase flex items-center justify-center space-x-2 font-bold"
             >
-              <span>{isLogin ? 'Login' : 'Register'}</span>
+              <span>{isLogin ? "Login" : "Register"}</span>
               <ArrowRight size={18} />
             </button>
           </form>
@@ -163,12 +210,12 @@ const Auth: React.FC = () => {
           {/* Toggle Login/Register */}
           <div className="mt-8 text-center border-t border-gov-border pt-6">
             <p className="text-gov-text-secondary text-sm font-bold">
-              {isLogin ? "New to the platform?" : "Already have an account?"}{' '}
+              {isLogin ? "New to the platform?" : "Already have an account?"}{" "}
               <button
                 onClick={() => setIsLogin(!isLogin)}
                 className="text-gov-green-primary hover:text-gov-green-secondary font-bold hover:underline transition-all ml-1"
               >
-                {isLogin ? 'Create Account' : 'Login Here'}
+                {isLogin ? "Create Account" : "Login Here"}
               </button>
             </p>
           </div>
@@ -176,8 +223,8 @@ const Auth: React.FC = () => {
 
         {/* Back to Landing */}
         <div className="mt-8 text-center">
-          <button 
-            onClick={() => navigate('/')}
+          <button
+            onClick={() => navigate("/")}
             className="text-gov-text-secondary hover:text-gov-green-primary font-bold uppercase text-[10px] tracking-widest transition-all"
           >
             ← Back to Landing
@@ -189,4 +236,3 @@ const Auth: React.FC = () => {
 };
 
 export default Auth;
-
