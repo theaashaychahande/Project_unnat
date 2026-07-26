@@ -2,6 +2,7 @@
   "name": "project-unnat",
   "version": "1.0.0",
   "description": "A professional website for Project Unnat using TypeScript, React, and Tailwind CSS.",
+  "type": "module",
   "main": "src/index.tsx",
   "scripts": {
     "start": "vite",
